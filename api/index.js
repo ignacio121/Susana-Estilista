@@ -1,20 +1,14 @@
-const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+import express from 'express';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => res.send('¡Servidor funcionando en Vercel!'));
 
-app.get('/data', async (req, res) => {
-    const { data, error } = await supabase.from('usuarios').select('*');
-    if (error) return res.status(500).send(error.message);
-    res.json(data);
-});
+app.use('/users', userRoutes);
 
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
