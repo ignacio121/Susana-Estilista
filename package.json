@@ -1,0 +1,25 @@
+{
+  "name": "susana-estilista",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignacio121/Susana-Estilista.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignacio121/Susana-Estilista/issues"
+  },
+  "homepage": "https://github.com/ignacio121/Susana-Estilista#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.46.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1"
+  }
+}
