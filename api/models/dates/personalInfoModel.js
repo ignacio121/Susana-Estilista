@@ -1,14 +1,4 @@
-import { supabase } from '../config/supabaseClient.js';
-
-// Verificar si un usuario existe
-export const findUserById = async (id_usuario) => {
-    const { data, error } = await supabase
-        .from('Usuarios')
-        .select('id_usuario')
-        .eq('id_usuario', id_usuario)
-        .single();
-    return { data, error };
-};
+import { supabase } from '../../config/supabaseClient.js';
 
 // Crear un registro de información personal
 export const insertPersonalInfo = async (personalInfo) => {

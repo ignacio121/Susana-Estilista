@@ -1,5 +1,5 @@
-import { insertPersonalInfo, findPersonalInfoByUserId } from '../models/personalInfoModel.js';
-import { findUserByName} from '../models/userModel.js';
+import { insertPersonalInfo, findPersonalInfoByUserId } from '../../models/dates/personalInfoModel.js';
+import { findUserByName} from '../../models/dates/userModel.js';
 
 export const addPersonalInfo = async (req, res) => {
     const { nombre, direccion, fecha_nacimiento, genero, nacionalidad } = req.body;

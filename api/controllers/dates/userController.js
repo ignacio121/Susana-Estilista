@@ -1,4 +1,4 @@
-import { createUser as addUser, getUsers as fetchUsers, findUserByName, findUserByRol } from '../models/userModel.js';
+import { createUser as addUser, getUsers as fetchUsers, findUserByName, findUserByRol } from '../../models/dates/userModel.js';
 
 export const getUsers = async (req, res) => {
     try {
@@ -13,7 +13,7 @@ export const getUser = async (req, res) => {
     const { name } = req.params;
 
     try {
-        const user = await findUserByName(name);
+        const {data:user} = await findUserByName(name);
         if (!user) {
             return res.status(401).json({ message: 'Usuario no encontrado' });
         }

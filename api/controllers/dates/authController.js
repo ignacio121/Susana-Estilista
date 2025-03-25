@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { findUserByEmail, findUserByFone, validatePassword } from '../models/userModel.js';
+import { findUserByEmail, findUserByFone, validatePassword } from '../../models/dates/userModel.js';
 
 export const loginUser = async (req, res) => {
     const { emailOrPhone, password } = req.body;
@@ -9,6 +9,7 @@ export const loginUser = async (req, res) => {
         let user;
         if (emailOrPhone.includes('@')) {
             // Si es un email
+            
             user = await findUserByEmail(emailOrPhone);
         } else {
             // Si es un número de teléfono

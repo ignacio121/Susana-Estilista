@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { supabase } from '../config/supabaseClient.js';
+import { supabase } from '../../config/supabaseClient.js';
 
 export const getUsers = async () => {
     const { data, error } = await supabase
@@ -23,6 +23,14 @@ export const getUsers = async () => {
     return data;
 };
 
+export const findUserById = async (id_usuario) => {
+    const { data, error } = await supabase
+        .from('Usuarios')
+        .select('id_usuario')
+        .eq('id_usuario', id_usuario)
+        .single();
+    return { data, error };
+};
 
 export const createUser = async (user) => {
     const hashedPassword = await bcrypt.hash(user.contraseña, 10); // Encripta la contraseña
@@ -69,9 +77,7 @@ export const findUserByName = async (name) => {
         `)
         .eq('nombre', name)
         .single();
-
-    if (error) throw error;
-    return data;
+    return {data,error};
 };
 
 
