@@ -6,6 +6,7 @@ import {
     editProduct,
     removeProduct,
     addImage,
+    fetchProductById,
 } from "../../controllers/sales/productsController.js";
 import { authenticateToken } from "../../middlewares/authMiddleware.js";
 
@@ -14,6 +15,9 @@ const upload = multer(); // Middleware para manejar archivos
 
 // Obtener todos los productos
 router.get("/", fetchProducts);
+
+// Obtener productos por ID
+router.get("/:id_producto", fetchProductById);
 
 // Crear un producto
 router.post("/", authenticateToken, createProduct);

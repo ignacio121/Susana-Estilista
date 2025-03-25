@@ -29,6 +29,36 @@ export const getAllProducts = async () => {
     return data;
 };
 
+// Obtener producto por id
+export const getProductbyID = async (id_producto) => {
+    const { data, error } = await supabase
+        .from("productos")
+        .select(`
+            id_producto,
+            nombre,
+            marca,
+            precio,
+            contenido,
+            stock,
+            fecha_creacion,
+            habilitado,
+            detalles_productos (
+                beneficios,
+                enfoque,
+                uso,
+                ingredientes
+            ),
+            imagenes_productos (
+                imagen_url,
+                descripcion
+            )
+        `)
+        .eq('id_producto', id_producto);
+
+    if (error) throw error;
+    return data;
+};
+
 
 // Crear producto
 export const addProduct = async (product) => {

@@ -1,4 +1,4 @@
-import { getAllProducts, addProduct, createProductDetails, updateProduct, updateProductDetails, deleteProduct, uploadImage } from "../../models/sales/productsModel.js";
+import { getAllProducts, addProduct, createProductDetails, updateProduct, updateProductDetails, deleteProduct, uploadImage, getProductbyID } from "../../models/sales/productsModel.js";
 
 // Obtener todos los productos
 export const fetchProducts = async (req, res) => {
@@ -6,6 +6,21 @@ export const fetchProducts = async (req, res) => {
         const products = await getAllProducts();
         res.json(products);
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Obtener un producto por ID
+export const fetchProductById = async (req, res) => {
+    try {
+        const { id_producto } = req.params;
+        const product = await getProductbyID(id_producto);
+        if (!product) {
+            return res.status(404).json({ message: "Producto no encontrado" });
+        }
+        res.json(product);
+    }
+    catch (error) { 
         res.status(500).json({ message: error.message });
     }
 };

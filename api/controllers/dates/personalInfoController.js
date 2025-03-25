@@ -12,13 +12,13 @@ export const addPersonalInfo = async (req, res) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        const id_usuario = user.id_usuario;
+        const id_usuario = user.data.id_usuario;
 
         // Verificar si ya existe información personal para este usuario
         const { data: existingInfo, error: existingError } = await findPersonalInfoByUserId(id_usuario);
 
         if (existingError) {
-            return res.status(500).json({ message: 'Error al verificar información existente', error: existingError });
+            return res.status(500).json({ message: 'Error al verificar información existente', error: existingError});
         }
 
         if (existingInfo) {

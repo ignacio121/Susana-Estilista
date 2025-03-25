@@ -43,7 +43,7 @@ export const loginUser = async (req, res) => {
         );
 
         // Devolver el token al cliente
-        res.json({ token });
+        res.json({ token, user: { id_usuario: user.id_usuario, nombre: user.nombre, email: user.email, rol: user.rol } });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
