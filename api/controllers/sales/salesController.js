@@ -1,4 +1,4 @@
-import { registrarVenta, registrarDetalleVenta, obtenerVentas, obtenerVentasPorUsuario } from '../../models/sales/salesmodel.js';
+import { registrarVenta, registrarDetalleVenta, obtenerVentas, obtenerVentasPorUsuario } from '../../models/sales/salesModel.js';
 import { findUserByName } from '../../models/dates/userModel.js';
 
 // Registrar nueva venta
