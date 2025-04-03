@@ -52,7 +52,7 @@ export const findUserByEmail = async (email) => {
         .from('usuarios')
         .select('*')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -124,11 +124,20 @@ export const findUserByFone = async (telefono) => {
             )
         `)
         .eq('telefono', telefono)
-        .single();
+        .maybeSingle(); 
     if (error) throw error;
     return data;
 };
 
 export const validatePassword = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
+};
+
+export const saveResetToken = async (userId, token) => {
+    const { error } = await supabase
+        .from('usuarios')
+        .update({ reset_token: token })
+        .eq('id_usuario', userId);
+
+    if (error) throw error;
 };

@@ -1,4 +1,4 @@
-import { createUser as addUser, getUsers as fetchUsers, findUserByName, findUserByRol } from '../../models/dates/userModel.js';
+import { createUser as addUser, getUsers as fetchUsers, findUserByEmail, findUserByName, findUserByRol, findUserByFone } from '../../models/dates/userModel.js';
 
 export const getUsers = async (req, res) => {
     try {
@@ -37,11 +37,24 @@ export const getUsersByRol = async (req, res) => {
     catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 export const createUser = async (req, res) => {
     try {
         const { nombre, email, telefono, contraseña, rol } = req.body;
+
+        const user = await findUserByEmail(email);
+
+        if (user) {
+            return res.status(409).json({ message: 'El email ya está en uso.' });
+        }
+
+        const userByfone = await findUserByFone(telefono);
+
+        if (userByfone) {
+            return res.status(409).json({ message: 'El telefono ya está en uso.' });
+        }
+        
         if (!email || !contraseña) {
             return res.status(400).json({ message: 'Email y contraseña son obligatorios.' });
         }

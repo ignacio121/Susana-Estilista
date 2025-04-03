@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { findUserByEmail, findUserByFone, validatePassword } from '../../models/dates/userModel.js';
+import bcrypt from 'bcrypt';
+import { findUserByEmail, findUserByFone, saveResetToken, validatePassword} from '../../models/dates/userModel.js';
+import { supabase } from '../../config/supabaseClient.js';
+import { generateResetToken, verifyResetToken } from '../../middlewares/authMiddleware.js';
+import { sendResetPasswordEmail } from '../../middlewares/emailService.js';
 
 export const loginUser = async (req, res) => {
     const { emailOrPhone, password } = req.body;
@@ -46,5 +50,60 @@ export const loginUser = async (req, res) => {
         res.json({ token, user: { id_usuario: user.id_usuario, nombre: user.nombre, email: user.email, rol: user.rol } });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const resetPassword = async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const user = await findUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "El email no está registrado" });
+      }
+  
+      // Generar token de restablecimiento
+      const token = generateResetToken(user);
+      await saveResetToken(user.id_usuario, token);
+      
+      // Construir enlace de restablecimiento
+      const resetLink = `http://peluqueria-susana.cl/reset-password?token=${token}`;
+  
+      // Enviar correo con Resend
+      await sendResetPasswordEmail(email, resetLink);
+  
+      return res.status(200).json({ message: "Correo de restablecimiento enviado con éxito" });
+  
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  };
+
+
+export const updatePassword = async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    try {
+        // Verificar si el token es válido y obtener al usuario
+        const user = await verifyResetToken(token);
+
+        // Hashear la nueva contraseña
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Actualizar la contraseña en la base de datos y eliminar el reset_token
+        const { error } = await supabase
+            .from("usuarios")
+            .update({ contraseña: hashedPassword, reset_token: null })
+            .eq("id_usuario", user.id_usuario);
+
+        if (error) {
+            throw new Error("Error al actualizar la contraseña", error, user);
+        }
+
+        return res.status(200).json({ message: "Contraseña actualizada con éxito" });
+
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
     }
 };
