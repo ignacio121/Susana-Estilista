@@ -27,11 +27,11 @@ export const fetchProductById = async (req, res) => {
 
 // Crear un nuevo producto
 export const createProduct = async (req, res) => {
-    const { nombre, marca, precio, contenido, stock, habilitado, detalles } = req.body;
+    const { nombre, descipcion, marca, precio, contenido, stock, habilitado, detalles } = req.body;
 
     try {
         // Crear el producto
-        const producto = await addProduct({ nombre, marca, precio, contenido, stock, habilitado });
+        const producto = await addProduct({ nombre, descipcion, marca, precio, contenido, stock, habilitado });
 
         // Crear los detalles del producto si se proporcionan
         if (detalles) {
@@ -54,12 +54,13 @@ export const createProduct = async (req, res) => {
 // Actualizar un producto
 export const editProduct = async (req, res) => {
     const { id_producto } = req.params;
-    const { nombre, marca, precio, contenido, stock, habilitado, detalles } = req.body;
+    const { nombre, descipcion, marca, precio, contenido, stock, habilitado, detalles } = req.body;
 
     try {
         // Actualizar el producto
         const productoActualizado = await updateProduct(id_producto, {
             nombre,
+            descipcion,
             marca,
             precio,
             contenido,

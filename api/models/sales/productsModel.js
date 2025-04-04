@@ -7,6 +7,7 @@ export const getAllProducts = async () => {
         .select(`
             id_producto,
             nombre,
+            descipcion,
             marca,
             precio,
             contenido,
@@ -36,6 +37,7 @@ export const getProductbyID = async (id_producto) => {
         .select(`
             id_producto,
             nombre,
+            descipcion,
             marca,
             precio,
             contenido,
