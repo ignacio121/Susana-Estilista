@@ -36,7 +36,7 @@ export const selectFavorites = async (id_usuario) => {
         const { data, error } = await supabase
             .from("productos_favoritos")
             .select(`id_producto,
-                detalles_producto: productos!id_producto (nombre, precio, marca),
+                detalles_producto: productos!id_producto (nombre, precio, marca, imagenes_productos (imagen_url)),
                 fecha_agregado`)
             .eq("id_usuario", id_usuario);
 
