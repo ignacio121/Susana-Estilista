@@ -9,7 +9,7 @@ export const addToCart = async (id_usuario, id_producto, cantidad) => {
             .select("cantidad")
             .eq("id_usuario", id_usuario)
             .eq("id_producto", id_producto)
-            .single();
+            .maybeSingle();
 
         if (checkError && checkError.code !== "PGRST116") {
             // Si ocurre un error diferente a "no rows returned", lanzar el error
@@ -39,6 +39,7 @@ export const addToCart = async (id_usuario, id_producto, cantidad) => {
         throw error;
     }
 };
+
 // Actualizar la cantidad de un producto en el carrito
 export const updateCartQuantity = async (id_usuario, id_producto, cantidad) => {
     const { data, error } = await supabase
@@ -67,7 +68,7 @@ export const removeFromCart = async (id_usuario, id_producto) => {
 export const getCartByUser = async (id_usuario) => {
     const { data, error } = await supabase
         .from("carrito_compras")
-        .select("id_producto, cantidad, productos(nombre, precio)")
+        .select("id_producto, cantidad, productos(nombre, precio, marca, imagenes_productos (imagen_url))")
         .eq("id_usuario", id_usuario);
 
     if (error) throw error;

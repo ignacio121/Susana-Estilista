@@ -11,7 +11,7 @@ export const addFavorite = async (req, res) => {
         }
 
         const data = await insertFavorite(id_usuario, id_producto);
-        res.status(201).json({ message: "Producto agregado a favoritos", data });
+        res.status(201).json({ message: "Producto agregado a favoritos" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -22,7 +22,7 @@ export const removeFavorite = async (req, res) => {
 
     try {
         const data = await deleteFavorite(id_usuario, id_producto);
-        res.status(200).json({ message: "Producto eliminado de favoritos", data });
+        res.status(200).json({ message: "Producto eliminado de favoritos" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
