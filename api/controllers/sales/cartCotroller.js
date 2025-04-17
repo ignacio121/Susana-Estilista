@@ -6,7 +6,7 @@ export const handleAddToCart = async (req, res) => {
 
     try {
         const data = await addToCart(id_usuario, id_producto, cantidad);
-        res.status(201).json({ message: "Producto agregado al carrito" });
+        res.status(201).json({ message: "Producto agregado al carrito con exito" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -18,7 +18,7 @@ export const handleUpdateQuantity = async (req, res) => {
 
     try {
         const data = await updateCartQuantity(id_usuario, id_producto, cantidad);
-        res.status(200).json({ message: "Cantidad actualizada" });
+        res.status(200).json({ message: "Cantidad actualizada con exito" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -30,7 +30,7 @@ export const handleRemoveFromCart = async (req, res) => {
 
     try {
         const data = await removeFromCart(id_usuario, id_producto);
-        res.status(200).json({ message: "Producto eliminado del carrito" });
+        res.status(200).json({ message: "Producto eliminado del carrito con exito" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
