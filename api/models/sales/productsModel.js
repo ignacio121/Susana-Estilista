@@ -108,6 +108,35 @@ export const updateProductDetails = async (id_producto, detailsData) => {
     return data;
 };
 
+export const actualizarStockProducto = async (id_producto, cantidadVendida) => {
+    // Obtener el producto actual para verificar el stock disponible
+    const { data: producto, error: errorProducto } = await supabase
+        .from('productos')
+        .select('stock')
+        .eq('id_producto', id_producto)
+        .single();
+    
+    if (errorProducto) throw errorProducto;
+
+    // Verificar si hay suficiente stock disponible
+    if (producto.stock < cantidadVendida) {
+        throw new Error(`Stock insuficiente para el producto con ID ${id_producto}`);
+    }
+
+    // Calcular el nuevo stock
+    const nuevoStock = producto.stock - cantidadVendida;
+
+    // Actualizar el stock del producto
+    const { data, error } = await supabase
+        .from('productos')
+        .update({ stock: nuevoStock })
+        .eq('id_producto', id_producto);
+
+    if (error) throw error;
+
+    return data;
+};
+
 // Eliminar un producto
 export const deleteProduct = async (id_producto) => {
     const { data, error } = await supabase

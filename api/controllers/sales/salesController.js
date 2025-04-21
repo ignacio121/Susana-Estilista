@@ -1,5 +1,6 @@
 import { registrarVenta, registrarDetalleVenta, obtenerVentas, obtenerVentasPorUsuario } from '../../models/sales/salesModel.js';
 import { findUserById, findUserByName } from '../../models/dates/userModel.js';
+import { actualizarStockProducto } from '../../models/sales/productsModel.js';
 
 // Registrar nueva venta
 export const registrarNuevaVenta = async (req, res) => {
@@ -33,9 +34,16 @@ export const registrarNuevaVenta = async (req, res) => {
             idUsuarioFinal = null;
         }
 
+        // Registrar la venta
         const id_venta = await registrarVenta(idUsuarioFinal, total, estado, nombre_cliente, telefono_cliente, pago);
 
+        // Registrar los detalles de la venta
         await registrarDetalleVenta(id_venta, detalles);
+
+        // Actualizar el stock de cada producto
+        for (const detalle of detalles) {
+            await actualizarStockProducto(detalle.id_producto, detalle.cantidad);
+        }
 
         // Respuesta exitosa
         res.status(201).json({
