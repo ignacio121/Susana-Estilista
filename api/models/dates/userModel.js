@@ -25,8 +25,8 @@ export const getUsers = async () => {
 
 export const findUserById = async (id_usuario) => {
     const { data, error } = await supabase
-        .from('Usuarios')
-        .select('id_usuario')
+        .from('usuarios')
+        .select('*')
         .eq('id_usuario', id_usuario)
         .single();
     return { data, error };

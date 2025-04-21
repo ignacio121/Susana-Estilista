@@ -1,27 +1,49 @@
 import { registrarVenta, registrarDetalleVenta, obtenerVentas, obtenerVentasPorUsuario } from '../../models/sales/salesModel.js';
-import { findUserByName } from '../../models/dates/userModel.js';
+import { findUserById, findUserByName } from '../../models/dates/userModel.js';
 
 // Registrar nueva venta
 export const registrarNuevaVenta = async (req, res) => {
     try {
-        const { nombre_usuario, total, estado, detalles } = req.body;
+        const { id_usuario, total, estado, detalles, nombre_cliente, telefono_cliente, pago } = req.body;
 
-        if (!nombre_usuario || !detalles || detalles.length === 0) {
-            return res.status(400).json({ message: 'Datos incompletos para registrar la venta.', nombre_usuario, total, estado, detalles });
+        // Validar que 'detalles' y 'total' estén presentes
+        if (!detalles || detalles.length === 0 || !total) {
+            return res.status(400).json({
+                message: 'Datos incompletos para registrar la venta.',
+                id_usuario, total, estado, detalles, nombre_cliente, telefono_cliente
+            });
         }
 
-        const { data: usuario } = await findUserByName(nombre_usuario);
+        let idUsuarioFinal = null;
 
-        const id_usuario = usuario.id_usuario;
+        if (id_usuario) {
+            const usuario = await findUserById(id_usuario);
+            if (!usuario.data) {
+                return res.status(404).json({ message: 'Usuario no encontrado.' });
+            }
 
-        // Registrar venta principal
-        const id_venta = await registrarVenta(id_usuario, total, estado);
+            idUsuarioFinal = usuario.data.id_usuario;
+        } else {
+            if (!nombre_cliente || !telefono_cliente) {
+                return res.status(400).json({
+                    message: 'Falta id_usuario o los datos de nombre y teléfono del cliente.'
+                });
+            }
 
-        // Registrar detalle de la venta
+            idUsuarioFinal = null;
+        }
+
+        const id_venta = await registrarVenta(idUsuarioFinal, total, estado, nombre_cliente, telefono_cliente, pago);
+
         await registrarDetalleVenta(id_venta, detalles);
 
-        res.status(201).json({ message: 'Venta registrada exitosamente', id_venta });
+        // Respuesta exitosa
+        res.status(201).json({
+            message: 'Venta registrada exitosamente',
+            id_venta
+        });
     } catch (error) {
+        // Manejo de errores
         res.status(500).json({ message: error.message });
     }
 };
