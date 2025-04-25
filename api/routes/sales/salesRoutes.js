@@ -5,7 +5,7 @@ import { authenticateToken } from '../../middlewares/authMiddleware.js';
 const router = express.Router();
 
 // Registrar nueva venta
-router.post('/', authenticateToken, registrarNuevaVenta);
+router.post('/', registrarNuevaVenta);
 
 // Obtener todas las ventas
 router.get('/', authenticateToken, obtenerTodasLasVentas);
