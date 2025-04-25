@@ -15,6 +15,8 @@ import cartRouter from './routes/sales/cartRoutes.js';
 import favoriteRouter from './routes/sales/favoritesRoutes.js';
 import commentsRouter from './routes/sales/commentsRoutes.js';
 
+import transbankRouter from './routes/sales/transbankRoutes.js';
+
 const app = express();
 app.use(express.json());
 
@@ -40,6 +42,8 @@ app.use('/productos', productsRouter);
 app.use('/carrito', cartRouter);
 app.use('/favoritos', favoriteRouter);
 app.use('/comentarios', commentsRouter);
+
+app.use("/webpay_plus", transbankRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

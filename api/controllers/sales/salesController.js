@@ -5,7 +5,7 @@ import { actualizarStockProducto } from '../../models/sales/productsModel.js';
 // Registrar nueva venta
 export const registrarNuevaVenta = async (req, res) => {
     try {
-        const { id_usuario, total, estado, detalles, nombre_cliente, telefono_cliente, pago } = req.body;
+        const { id_usuario, buy_order, total, estado, detalles, nombre_cliente, telefono_cliente, pago } = req.body;
 
         // Validar que 'detalles' y 'total' estén presentes
         if (!detalles || detalles.length === 0 || !total) {
@@ -35,7 +35,7 @@ export const registrarNuevaVenta = async (req, res) => {
         }
 
         // Registrar la venta
-        const id_venta = await registrarVenta(idUsuarioFinal, total, estado, nombre_cliente, telefono_cliente, pago);
+        const id_venta = await registrarVenta(idUsuarioFinal, buy_order, total, estado, nombre_cliente, telefono_cliente, pago);
 
         // Registrar los detalles de la venta
         await registrarDetalleVenta(id_venta, detalles);

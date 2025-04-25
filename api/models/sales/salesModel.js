@@ -1,10 +1,10 @@
 import { supabase } from '../../config/supabaseClient.js';
 
 // Registrar venta
-export const registrarVenta = async (id_usuario, total, estado = 'EN PROCESO', nombre_cliente, telefono_cliente, pago) => {
+export const registrarVenta = async (id_usuario, buy_order, total, estado = 'EN PROCESO', nombre_cliente, telefono_cliente, pago) => {
     const { data, error } = await supabase
         .from('ventas')
-        .insert([{ id_usuario, fecha_venta: new Date(), total, estado, nombre_cliente, telefono_cliente, pago }])
+        .insert([{ id_usuario, fecha_venta: new Date(), buy_order, total, estado, nombre_cliente, telefono_cliente, pago }])
         .select('id_venta')
         .single();
     if (error) throw error;
