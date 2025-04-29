@@ -1,15 +1,51 @@
 import { supabase } from '../../config/supabaseClient.js';
 
 // Registrar venta
-export const registrarVenta = async (id_usuario, buy_order, total, estado = 'EN PROCESO', nombre_cliente, telefono_cliente, pago) => {
+export const registrarVenta = async (
+    id_usuario,
+    buy_order,
+    total,
+    estado = 'EN PROCESO',
+    nombre_cliente,
+    email_cliente,
+    pago
+  ) => {
+    // Verificar si ya existe una venta con el mismo buy_order
+    const { data: existingSale, error: checkError } = await supabase
+      .from('ventas')
+      .select('id_venta')
+      .eq('buy_order', buy_order)
+      .single();
+  
+    if (checkError && checkError.code !== 'PGRST116') { // Ignorar el error si no hay coincidencia
+      throw checkError;
+    }
+  
+    if (existingSale) {
+      // Si la venta ya existe, no crear una nueva
+      throw new Error(`La venta con el buy_order "${buy_order}" ya existe.`);
+    }
+  
+    // Insertar nueva venta si no existe
     const { data, error } = await supabase
-        .from('ventas')
-        .insert([{ id_usuario, fecha_venta: new Date(), buy_order, total, estado, nombre_cliente, telefono_cliente, pago }])
-        .select('id_venta')
-        .single();
+      .from('ventas')
+      .insert([{
+        id_usuario,
+        fecha_venta: new Date(),
+        buy_order,
+        total,
+        estado,
+        nombre_cliente,
+        email_cliente,
+        pago,
+      }])
+      .select('id_venta')
+      .single();
+  
     if (error) throw error;
+  
     return data.id_venta;
-};
+  };
 
 // Registrar detalle de venta
 export const registrarDetalleVenta = async (id_venta, detalles) => {

@@ -1,4 +1,4 @@
-import { addToCart, updateCartQuantity, removeFromCart, getCartByUser } from "../../models/sales/cartModel.js";
+import { addToCart, updateCartQuantity, removeFromCart, getCartByUser, cleanCart } from "../../models/sales/cartModel.js";
 
 // Agregar producto al carrito
 export const handleAddToCart = async (req, res) => {
@@ -47,3 +47,14 @@ export const handleGetCartByUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const handleCleanCart = async (req, res) => {
+    const { id_usuario } = req.params;
+
+    try {
+        const data = await cleanCart(id_usuario);
+        res.status(200).json({ message: "Carrito limpiado con exito" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

@@ -142,3 +142,13 @@ export const getCartByUser = async (id_usuario) => {
     if (error) throw error;
     return data;
 };
+
+export const cleanCart = async (id_usuario) => {
+    const { data, error } = await supabase
+        .from("carrito_compras")
+        .delete()
+        .eq("id_usuario", id_usuario);
+
+    if (error) throw error;
+    return data;
+}

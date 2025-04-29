@@ -1,5 +1,5 @@
 import express from "express";
-import { handleAddToCart, handleUpdateQuantity, handleRemoveFromCart, handleGetCartByUser } from "../../controllers/sales/cartCotroller.js";
+import { handleAddToCart, handleUpdateQuantity, handleRemoveFromCart, handleGetCartByUser, handleCleanCart } from "../../controllers/sales/cartCotroller.js";
 import { authenticateToken } from '../../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -15,5 +15,7 @@ router.delete("/remove", authenticateToken, handleRemoveFromCart);
 
 // Ruta para obtener el carrito de un usuario
 router.get("/:id_usuario", authenticateToken, handleGetCartByUser);
+
+router.delete("/clean/:id_usuario", authenticateToken, handleCleanCart);
 
 export default router;
