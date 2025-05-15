@@ -1,15 +1,25 @@
 import pkg from 'transbank-sdk';
-const { Options, IntegrationApiKeys, Environment, IntegrationCommerceCodes, WebpayPlus } = pkg;
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const { Options, WebpayPlus, Environment } = pkg;
+
+// Define el entorno según la variable de entorno
+const environment = process.env.ENVIRONMENT === 'Produccion' ? Environment.Production : Environment.Integration;
+
+// Define las opciones para Webpay
+const options = new Options(
+    process.env.COMMERCE_CODE,
+    process.env.API_KEY_SECRET,
+    environment
+);
 
 export const createTransaction = async (req, res) => {
     try {
         const { buyOrder, sessionId, amount, returnUrl } = req.body;
 
-        const tx = new WebpayPlus.Transaction(new Options(
-            IntegrationCommerceCodes.WEBPAY_PLUS,
-            IntegrationApiKeys.WEBPAY,
-            Environment.Integration
-        ));
+        const tx = new WebpayPlus.Transaction(options);
 
         const response = await tx.create(buyOrder, sessionId, amount, returnUrl);
 
@@ -24,7 +34,7 @@ export const getTransaction = async (req, res) => {
     try {
         const { token } = req.body;
 
-        const tx = new WebpayPlus.Transaction(new Options(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, Environment.Integration));
+        const tx = new WebpayPlus.Transaction(options);
         const response = await tx.commit(token);
 
         return res.status(201).json(response);
@@ -38,7 +48,7 @@ export const refundTransaction = async (req, res) => {
     try {
         const { token, amount } = req.body;
 
-        const tx = new WebpayPlus.Transaction(new Options(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, Environment.Integration));
+        const tx = new WebpayPlus.Transaction(options);
         const response = await tx.refund(token, amount);
         
         return res.status(201).json(response);

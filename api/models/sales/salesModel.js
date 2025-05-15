@@ -143,40 +143,41 @@ export const obtenerVentaPorOrder = async (buy_order) => {
 
 // Obtener ventas por usuario
 export const obtenerVentasPorUsuario = async (id_usuario) => {
-  const { data, error } = await supabase
-      .from('ventas')
-      .select(`
-          id_venta,
-          fecha_venta,
-          total,
-          estado,
-          buy_order,
-          pago,
-          detalle_ventas (
-              id_producto,
-              cantidad,
-              precio_unitario,
-              productos (
-                  nombre
-              )
-          )
-      `)
-      .eq('id_usuario', id_usuario);
+    const { data, error } = await supabase
+        .from('ventas')
+        .select(`
+            id_venta,
+            fecha_venta,
+            total,
+            estado,
+            buy_order,
+            pago,
+            detalle_ventas (
+                id_producto,
+                cantidad,
+                precio_unitario,
+                productos (
+                    nombre
+                )
+            )
+        `)
+        .eq('id_usuario', id_usuario)
+        .order('fecha_venta', { ascending: false }); // Ordenar por fecha_venta en orden descendente
   
-  if (error) throw error;
+    if (error) throw error;
 
-  // Reestructurar los datos para incluir "nombre_producto" directamente en "detalle_ventas"
-  const transformedData = data.map((venta) => ({
-      ...venta,
-      detalle_ventas: venta.detalle_ventas.map((detalle) => ({
-          id_producto: detalle.id_producto,
-          nombre_producto: detalle.productos.nombre, // Agregar el nombre del producto
-          precio_unitario: detalle.precio_unitario,
-          cantidad: detalle.cantidad,
-      })),
-  }));
+    // Reestructurar los datos para incluir "nombre_producto" directamente en "detalle_ventas"
+    const transformedData = data.map((venta) => ({
+        ...venta,
+        detalle_ventas: venta.detalle_ventas.map((detalle) => ({
+            id_producto: detalle.id_producto,
+            nombre_producto: detalle.productos.nombre, // Agregar el nombre del producto
+            precio_unitario: detalle.precio_unitario,
+            cantidad: detalle.cantidad,
+        })),
+    }));
 
-  return transformedData;
+    return transformedData;
 };
 
 export const obtenerVentasPorProducto = async () => {
