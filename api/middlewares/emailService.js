@@ -17,7 +17,8 @@ export const sendResetPasswordEmail = async (email, resetLink) => {
             
             <p style="color: #333;">Hola,</p>
             <p style="color: #555;">
-              Recibimos una solicitud para restablecer tu contraseña.  
+              Recibimos una solicitud para restablecer tu contraseña.
+              Este link tiene una duración de 15 minutos, después de este tiempo, no funcionara mas.
               Para continuar, haz clic en el siguiente botón:
             </p>
 
@@ -78,9 +79,9 @@ export const saleDetailsEmail = async (email, uuid, details, nombre_cliente, tot
             <p style="color: #555;">
               Gracias por tu compra en <strong>Peluquería Susana</strong>.  
               Tu orden de compra es: <strong>ORD-${orden_compra}</strong>.  
-              Para retirar tu producto, por favor presenta el siguiente código QR en nuestra tienda:
+              Para retirar tu producto, por favor presenta el siguiente código QR en nuestro local:
             </p>
-    
+
             <div style="margin: 20px 0;">
               <img src="${qrImageURL}" alt="Código QR" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 10px;">
             </div>
@@ -103,11 +104,12 @@ export const saleDetailsEmail = async (email, uuid, details, nombre_cliente, tot
                 </tr>
               </tbody>
             </table>
-    
+
             <p style="color: #777;">
               Este código QR está asociado a tu compra y nos permitirá verificar los detalles rápidamente.
             </p>
-    
+
+            <!-- Contenido final -->
             <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
             <p style="color: #aaa; font-size: 12px;">
               Si tienes alguna consulta, no dudes en contactarnos.  

@@ -11,6 +11,7 @@ export const getAllProducts = async () => {
             marca,
             precio,
             contenido,
+            categoria,
             stock,
             fecha_creacion,
             habilitado,
@@ -41,6 +42,7 @@ export const getProductbyID = async (id_producto) => {
             marca,
             precio,
             contenido,
+            categoria,
             stock,
             fecha_creacion,
             habilitado,
@@ -91,7 +93,7 @@ export const updateProduct = async (id_producto, productData) => {
         .update(productData)
         .eq('id_producto', id_producto)
         .select()
-        .single();
+        .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -139,12 +141,104 @@ export const actualizarStockProducto = async (id_producto, cantidadVendida) => {
 
 // Eliminar un producto
 export const deleteProduct = async (id_producto) => {
+  try {
+    const folderPath = `productos/${id_producto}`;
+
+    // Lista las imágenes asociadas al producto
+    const { data: files, error: listError } = await supabase
+      .storage
+      .from("imagenes") // Nombre del bucket
+      .list(folderPath, { limit: 100 });
+
+    if (listError) {
+      throw new Error("Error al listar las imágenes: " + listError.message);
+    }
+
+    // Verifica si hay archivos para eliminar
+    if (files.length > 0) {
+      const filePaths = files.map((file) => `${folderPath}/${file.name}`);
+      // Elimina las imágenes del bucket
+      const { error: removeError } = await supabase
+        .storage
+        .from("imagenes") // Nombre del bucket
+        .remove(filePaths);
+
+      if (removeError) {
+        throw new Error("Error al eliminar las imágenes: " + removeError.message);
+      }
+    }
+
+    // Elimina el producto de la base de datos
     const { data, error } = await supabase
         .from("productos")
         .delete()
         .eq("id_producto", id_producto);
     if (error) throw error;
     return data;
+
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const deleteImage = async (filePath) => {
+    try {
+
+        // Obtener el ID de la imagen desde la base de datos
+        const id_imagen = await getImageIdByPartialUrl(filePath);
+
+        if (id_imagen) {
+            // Eliminar el registro de la tabla
+            const { data, error } = await supabase
+                .from("imagenes_productos")
+                .delete()
+                .eq("id_imagen", id_imagen);
+
+            if (error) {
+                throw error;
+            }
+
+        }
+
+        const decodedFilePath = decodeURIComponent(filePath);
+
+        // Eliminar el archivo del bucket
+        const { data: dataStorage, error: errorStorage } = await supabase.storage
+            .from("imagenes") // Nombre del bucket
+            .remove([decodedFilePath]); // Pasar el path codificado tal como está
+
+        if (errorStorage) {
+            throw errorStorage;
+        }
+
+        return dataStorage;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+const getImageIdByPartialUrl = async (filePath) => {
+    try {
+        const { data, error } = await supabase
+            .from("imagenes_productos")
+            .select("id_imagen")
+            .like("imagen_url", `%${filePath}%`); // Usa el filePath codificado directamente
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            console.log("No se encontró un registro en la base de datos con el filepath:", filePath);
+            return null;
+        }
+
+        return data[0].id_imagen; // Devuelve el primer resultado encontrado
+    } catch (error) {
+        console.error("Error al buscar el ID de la imagen:", error.message);
+        return null;
+    }
 };
 
 // Subir imágenes a Supabase

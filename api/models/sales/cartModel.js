@@ -89,10 +89,6 @@ export const updateCartQuantity = async (id_usuario, id_producto, cantidad) => {
             throw new Error("No se pudo obtener el stock del producto.");
         }
 
-        if (!product || product.stock === 0) {
-            throw new Error("El producto no tiene stock disponible.");
-        }
-
         const stockDisponible = product.stock;
 
         // Validar que la cantidad no exceda el stock disponible
@@ -118,7 +114,6 @@ export const updateCartQuantity = async (id_usuario, id_producto, cantidad) => {
         throw error;
     }
 };
-
 
 // Eliminar un producto del carrito
 export const removeFromCart = async (id_usuario, id_producto) => {

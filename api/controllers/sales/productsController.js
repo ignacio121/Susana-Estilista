@@ -1,4 +1,4 @@
-import { getAllProducts, addProduct, createProductDetails, updateProduct, updateProductDetails, deleteProduct, uploadImage, getProductbyID } from "../../models/sales/productsModel.js";
+import { getAllProducts, addProduct, createProductDetails, updateProduct, updateProductDetails, deleteProduct, uploadImage, getProductbyID, deleteImage } from "../../models/sales/productsModel.js";
 
 // Obtener todos los productos
 export const fetchProducts = async (req, res) => {
@@ -27,11 +27,11 @@ export const fetchProductById = async (req, res) => {
 
 // Crear un nuevo producto
 export const createProduct = async (req, res) => {
-    const { nombre, descripcion, marca, precio, contenido, stock, habilitado, detalles } = req.body;
+    const { nombre, descripcion, categoria, marca, precio, contenido, stock, habilitado, detalles } = req.body;
 
     try {
         // Crear el producto
-        const producto = await addProduct({ nombre, descripcion, marca, precio, contenido, stock, habilitado });
+        const producto = await addProduct({ nombre, descripcion, categoria, marca, precio, contenido, stock, habilitado });
 
         // Crear los detalles del producto si se proporcionan
         if (detalles) {
@@ -54,13 +54,20 @@ export const createProduct = async (req, res) => {
 // Actualizar un producto
 export const editProduct = async (req, res) => {
     const { id_producto } = req.params;
-    const { nombre, descripcion, marca, precio, contenido, stock, habilitado, detalles } = req.body;
+    const { nombre, descripcion, categoria, marca, precio, contenido, stock, habilitado, detalles } = req.body;
 
     try {
         // Actualizar el producto
+        const existingProduct = await getProductbyID(id_producto);
+
+        if (existingProduct.length === 0){
+            return res.status(404).json({ message: "Producto no encontrado" });
+        };
+
         const productoActualizado = await updateProduct(id_producto, {
             nombre,
             descripcion,
+            categoria,
             marca,
             precio,
             contenido,
@@ -98,6 +105,18 @@ export const removeProduct = async (req, res) => {
         res.json({ message: "Producto eliminado exitosamente" });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// Eliminar imagenes de productos
+export const removeProductImage = async (req, res) => {
+    const { imageUrl} = req.params;
+
+    try {
+        await deleteImage(imageUrl);
+        res.json({ message: "Imagen eliminada exitosamente" });
+    } catch (error) {
+        console.error("No se pudo eliminar la imagen:", error.message);
     }
 };
 

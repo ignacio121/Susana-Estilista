@@ -7,6 +7,7 @@ import {
     removeProduct,
     addImage,
     fetchProductById,
+    removeProductImage,
 } from "../../controllers/sales/productsController.js";
 import { authenticateToken } from "../../middlewares/authMiddleware.js";
 
@@ -27,6 +28,9 @@ router.put("/:id_producto", authenticateToken, editProduct);
 
 // Eliminar un producto
 router.delete("/:id_producto", authenticateToken, removeProduct);
+
+// Eliminar imagen de un producto
+router.delete("/image/:imageUrl", authenticateToken, removeProductImage);
 
 // Subir imágenes
 router.post("/:id_producto/images", upload.single("image"), addImage);

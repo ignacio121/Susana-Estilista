@@ -1,5 +1,5 @@
-import { registrarVenta, registrarDetalleVenta, obtenerVentas, obtenerVentasPorUsuario } from '../../models/sales/salesModel.js';
-import { findUserById, findUserByName } from '../../models/dates/userModel.js';
+import { registrarVenta, registrarDetalleVenta, obtenerVentaPorId, obtenerVentasPorUsuario, obtenerVentasPorProducto, obtenerVentaPorOrder, entregarVenta } from '../../models/sales/salesModel.js';
+import { findUserById } from '../../models/dates/userModel.js';
 import { actualizarStockProducto } from '../../models/sales/productsModel.js';
 import { saleDetailsEmail } from '../../middlewares/emailService.js';
 
@@ -62,7 +62,7 @@ export const registrarNuevaVenta = async (req, res) => {
 // Obtener todas las ventas
 export const obtenerTodasLasVentas = async (req, res) => {
     try {
-        const ventas = await obtenerVentas();
+        const ventas = await obtenerVentasPorProducto();
         res.json(ventas);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -71,15 +71,47 @@ export const obtenerTodasLasVentas = async (req, res) => {
 
 // Obtener ventas por usuario
 export const obtenerVentasDeUsuario = async (req, res) => {
-    const { nombre_usuario } = req.params;
-
-    const { data: usuario } = await findUserByName(nombre_usuario);
-
-    const id_usuario = usuario.id_usuario;
+    const { id_usuario } = req.params;
     
     try {
         const ventas = await obtenerVentasPorUsuario(id_usuario);
         res.json(ventas);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Obtener venta por id
+export const obtenerVentaID = async (req, res) => {
+    const { id_venta } = req.params;
+    
+    try {
+        const venta = await obtenerVentaPorId(id_venta);
+        res.json(venta);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Obtener venta por orden de compra
+export const obtenerVentaOrden = async (req, res) => {
+    const { buy_order } = req.params;
+    
+    try {
+        const venta = await obtenerVentaPorOrder(buy_order);
+        res.json(venta);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Entregar venta por id
+export const entregarVentaID = async (req, res) => {
+    const { id_venta } = req.params;
+    
+    try {
+        const venta = await entregarVenta(id_venta);
+        res.json({ message: "Venta entregada con exito"});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

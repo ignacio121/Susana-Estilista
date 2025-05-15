@@ -1,5 +1,5 @@
 import express from 'express';
-import { registrarNuevaVenta, obtenerTodasLasVentas, obtenerVentasDeUsuario } from '../../controllers/sales/salesController.js';
+import { registrarNuevaVenta, obtenerTodasLasVentas, obtenerVentasDeUsuario, obtenerVentaID, obtenerVentaOrden, entregarVentaID } from '../../controllers/sales/salesController.js';
 import { authenticateToken } from '../../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -11,6 +11,15 @@ router.post('/', registrarNuevaVenta);
 router.get('/', authenticateToken, obtenerTodasLasVentas);
 
 // Obtener ventas por usuario
-router.get('/:nombre_usuario', authenticateToken, obtenerVentasDeUsuario);
+router.get('/:id_usuario', authenticateToken, obtenerVentasDeUsuario);
+
+// Obtener venta por id
+router.get('/id/:id_venta', authenticateToken, obtenerVentaID);
+
+// Obtener venta por orden de compra
+router.get('/orden/:buy_order', authenticateToken, obtenerVentaOrden);
+
+// Obtener venta por orden de compra
+router.put('/entrega/:id_venta', authenticateToken, entregarVentaID);
 
 export default router;

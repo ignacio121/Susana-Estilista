@@ -27,20 +27,22 @@ export const generateResetToken = (user) => {
 };
 
 export const verifyResetToken = async (token) => {
-   
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const { data: user, error } = await supabase
-        .from("usuarios")
-        .select("id_usuario, email")
-        .eq("id_usuario", decoded.id_usuario)
-        .eq("reset_token", token)
-        .single();
+        const { data: user, error } = await supabase
+            .from("usuarios")
+            .select("id_usuario, email")
+            .eq("id_usuario", decoded.id_usuario)
+            .eq("reset_token", token)
+            .single();
 
-    if (error || !user) {
-        throw new Error("Token inválido o expirado", error, user);
+        if (error || !user) {
+            throw new Error("El enlace para restablecer tu contraseña ya no es válido. Por favor solicita uno nuevo.");
+        }
+
+        return user;
+    } catch (err) {
+        throw new Error("El enlace para restablecer tu contraseña ya no es válido. Por favor solicita uno nuevo.");
     }
-
-    return user;
-
 };

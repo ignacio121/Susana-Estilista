@@ -32,5 +32,18 @@ export const getTransaction = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: 'Error creating transaction', error: error.message });
     }
-}
+};
 
+export const refundTransaction = async (req, res) => {
+    try {
+        const { token, amount } = req.body;
+
+        const tx = new WebpayPlus.Transaction(new Options(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, Environment.Integration));
+        const response = await tx.refund(token, amount);
+        
+        return res.status(201).json(response);
+        
+    } catch (error) {
+        return res.status(500).json({ message: 'Error reversing transaction', error: error.message });
+    }
+};
