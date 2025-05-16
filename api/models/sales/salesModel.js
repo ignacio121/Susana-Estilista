@@ -182,69 +182,81 @@ export const obtenerVentasPorUsuario = async (id_usuario) => {
 
 export const obtenerVentasPorProducto = async () => {
   const { data: productos, error } = await supabase
-      .from('productos')
-      .select(`
-          id_producto,
-          nombre,
-          detalle_ventas (
-              id_detalle,
-              cantidad,
-              precio_unitario,
-              ventas (
-                  id_venta,
-                  fecha_venta,
-                  estado,
-                  buy_order,
-                  pago
-              )
-          ),
-          imagenes_productos!inner (
-              imagen_url
-          )
-      `)
+    .from('productos')
+    .select(`
+        id_producto,
+        nombre,
+        detalle_ventas (
+            id_detalle,
+            cantidad,
+            precio_unitario,
+            ventas (
+                id_venta,
+                fecha_venta,
+                estado,
+                buy_order,
+                pago
+            )
+        ),
+        imagenes_productos!inner (
+            imagen_url
+        )
+    `);
 
   if (error) throw error;
 
   // Procesar los datos para agregar totales y agrupaciones
   const ventasPorProducto = productos.map(producto => {
-      const ordenes = producto.detalle_ventas.map(detalle => ({
-          id_venta: detalle.ventas.id_venta,
-          buy_order: detalle.ventas.buy_order,
-          fecha_venta: detalle.ventas.fecha_venta,
-          estado: detalle.ventas.estado,
-          pago: detalle.ventas.pago,
-          cantidad: detalle.cantidad
-      }));
+    const ordenes = producto.detalle_ventas.map(detalle => ({
+      id_venta: detalle.ventas.id_venta,
+      buy_order: detalle.ventas.buy_order,
+      fecha_venta: detalle.ventas.fecha_venta,
+      estado: detalle.ventas.estado,
+      pago: detalle.ventas.pago,
+      cantidad: detalle.cantidad
+    }));
 
-      const totalVentas = producto.detalle_ventas.length;
-      const cantidadTotalVendida = producto.detalle_ventas.reduce((acc, detalle) => acc + detalle.cantidad, 0);
-      const cantidadEntregada = producto.detalle_ventas.reduce((acc, detalle) =>
-          detalle.ventas.estado === 'ENTREGADO' ? acc + detalle.cantidad : acc, 0);
-      const cantidadPendiente = producto.detalle_ventas.reduce((acc, detalle) =>
-          !['ENTREGADO', 'CANCELADO'].includes(detalle.ventas.estado) ? acc + detalle.cantidad : acc, 0);
+    const totalVentas = producto.detalle_ventas.length;
+    const cantidadTotalVendida = producto.detalle_ventas.reduce((acc, detalle) => acc + detalle.cantidad, 0);
+    const cantidadEntregada = producto.detalle_ventas.reduce((acc, detalle) =>
+      detalle.ventas.estado === 'ENTREGADO' ? acc + detalle.cantidad : acc, 0);
+    const cantidadPendiente = producto.detalle_ventas.reduce((acc, detalle) =>
+      !['ENTREGADO', 'CANCELADO'].includes(detalle.ventas.estado) ? acc + detalle.cantidad : acc, 0);
 
-      const ventasConcretadas = producto.detalle_ventas.filter(detalle => detalle.ventas.estado === 'ENTREGADO').length;
-      const ventasPendientes = producto.detalle_ventas.filter(detalle => !['ENTREGADO', 'CANCELADO'].includes(detalle.ventas.estado)).length;
+    const ventasConcretadas = producto.detalle_ventas.filter(detalle => detalle.ventas.estado === 'ENTREGADO').length;
+    const ventasPendientes = producto.detalle_ventas.filter(detalle => !['ENTREGADO', 'CANCELADO'].includes(detalle.ventas.estado)).length;
 
-      return {
-          id_producto: producto.id_producto,
-          nombre_producto: producto.nombre,
-          imagen_url: producto.imagenes_productos?.[0]?.imagen_url || null,
-          total_ventas: totalVentas,
-          ventas_concretadas: ventasConcretadas,
-          ventas_pendientes: ventasPendientes,
-          cantidad_total_vendida: cantidadTotalVendida,
-          cantidad_entregada: cantidadEntregada,
-          cantidad_pendiente: cantidadPendiente,
-          ordenes_asociadas: ordenes
-      };
+    // Calcular las ganancias con base en las ventas entregadas o pendientes pero pagadas
+    const ganancias = producto.detalle_ventas.reduce((acc, detalle) => {
+      if (
+        detalle.ventas.estado === 'ENTREGADO' || // Ventas entregadas
+        (detalle.ventas.estado !== 'CANCELADO' && detalle.ventas.pago === true) // Ventas pendientes pagadas
+      ) {
+        return acc + detalle.cantidad * detalle.precio_unitario;
+      }
+      return acc;
+    }, 0);
+
+    return {
+      id_producto: producto.id_producto,
+      nombre_producto: producto.nombre,
+      imagen_url: producto.imagenes_productos?.[0]?.imagen_url || null,
+      total_ventas: totalVentas,
+      ventas_concretadas: ventasConcretadas,
+      ventas_pendientes: ventasPendientes,
+      cantidad_total_vendida: cantidadTotalVendida,
+      cantidad_entregada: cantidadEntregada,
+      cantidad_pendiente: cantidadPendiente,
+      ganancias,
+      ordenes_asociadas: ordenes
+    };
   });
 
   // Ordenar: primero los productos con ventas, luego los que no tienen ventas
   ventasPorProducto.sort((a, b) => {
-      if (a.total_ventas === 0 && b.total_ventas > 0) return 1;
-      if (a.total_ventas > 0 && b.total_ventas === 0) return -1;
-      return 0;
+    if (a.total_ventas === 0 && b.total_ventas > 0) return 1;
+    if (a.total_ventas > 0 && b.total_ventas === 0) return -1;
+    return 0;
   });
 
   return ventasPorProducto;
